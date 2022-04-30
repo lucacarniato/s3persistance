@@ -9,12 +9,12 @@ from LocalHostPersistance import LocalHostPersistance
 
 
 class S3Persistance:
-    """This class can be used to download data from S3 to a local temporary folder or upload files to S3.
-    Files are stored in a folder named that mirrors the S3 bucket structure.
+    """This class can be used for downloading data from S3 to a local temporary folder or for uploading files to S3.
+    Files are stored in a temporary folder mirroring the S3 bucket structure.
     """
 
     def __init__(self, persistance_bucket: str):
-        """S3Persistance constructor
+        """Class constructor
 
         Args:
             persistance_bucket (str): The bucket name
@@ -77,7 +77,7 @@ class S3Persistance:
                 return True
         return False
 
-    def download_one_file(self, bucket_path):
+    def download_one_file(self, bucket_path: str):
         """Downloads a file from the bucket to the local temporary folder.
 
         Args:
@@ -98,7 +98,7 @@ class S3Persistance:
             return True
         return False
 
-    def download_all_files_in_key(self, key):
+    def download_all_files_in_key(self, key: str):
         """Downloads all files in a bucket key to the local temporary folder.
 
         Args:
@@ -115,7 +115,7 @@ class S3Persistance:
             LocalHostPersistance.create_directory(local_file_dir)
             self.s3_client.download_file(self.persistance_bucket, bucket_path, local_file_path)
 
-    def delete_all_files_in_key(self, key):
+    def delete_all_files_in_key(self, key: str):
         """Deletes all files in a bucket key.
 
         Args:
@@ -128,7 +128,7 @@ class S3Persistance:
                 continue
             self.delete_file(bucket_path)
 
-    def delete_file(self, bucket_path):
+    def delete_file(self, bucket_path: str):
         """Deletes a single file in the bucket.
 
         Args:
@@ -136,11 +136,13 @@ class S3Persistance:
         """
         self.s3_resource.Object(self.persistance_bucket, bucket_path).delete()
 
-    def write_csv(self, bucket_path, df, host_delete_existing_file=True):
+    def write_csv(self, bucket_path: str, df, host_delete_existing_file=True):
         """Writes a csv file to bucket
 
         Args:
             bucket_path (str): The file bucket path.
+            df (pd.dataframe): The dataframe to write to s3.
+            host_delete_existing_file (bool): If True, deletes the file if it exists.
         """
         if host_delete_existing_file:
             self.delete_file(bucket_path)
@@ -153,6 +155,7 @@ class S3Persistance:
 
         Args:
             bucket_path (str): The file bucket path.
+            data (dict): The dict data to write to s3.
         """
         if host_delete_existing_file and self.check_if_file_exist(bucket_path):
             self.delete_file(bucket_path)
@@ -179,6 +182,8 @@ class S3Persistance:
 
         Args:
             bucket_path (str): The file bucket path.
+            data (dict): The data to write to s3.
+            host_delete_existing_file (bool): If True, deletes the file if it exists.
         """
         if host_delete_existing_file and self.check_if_file_exist(bucket_path):
             self.delete_file(bucket_path)
